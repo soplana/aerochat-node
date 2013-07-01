@@ -8,4 +8,8 @@ var chat = io.sockets.on('connection', function (socket){
         socket.join(data.room);
         chat.in(data.room).emit('newMember', data.name);
     });
+    
+    socket.on('say', function(data){
+        chat.in(data.room).emit('messageCatch', data.message);
+    });
 });
