@@ -1,9 +1,11 @@
 var io = require('socket.io').listen(8080);
 
-io.sockets.on('connection', function (socket){
+var chat = io.sockets.on('connection', function (socket){
+
     socket.emit('connected');
-    
-    socket.on('welcome', function (message) {
-        socket.broadcast.emit('newMember', message);
+
+    socket.on('joinRoom', function(data){
+        socket.join(data.room);
+        chat.in(data.room).emit('newMember', data.name);
     });
 });
