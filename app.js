@@ -10,6 +10,6 @@ var chat = io.sockets.on('connection', function (socket){
     });
     
     socket.on('say', function(data){
-        chat.in(data.room).emit('messageCatch', data.message);
+        chat.in(data.room).emit('messageCatch', {name: data.name, message: data.message});
     });
 });
