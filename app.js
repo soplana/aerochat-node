@@ -1,22 +1,8 @@
-var io = require('socket.io').listen(8080);
-var mongo = require('mongoose');
-
-// DB
-mongo.connect('mongodb://localhost/aerochat_dev');
-var Schema = mongo.Schema, ObjectId = Schema.ObjectId;
-
-var User = new Schema({
-    _id  : ObjectId,
-    name : String,
-    room : String,
-    key  : String
-});
-
-var UserModel = mongo.model('User', User);
+var io = require('socket.io').listen(8080),
+    model = require('./model/user.js');
 
 // socket
 var chat = io.sockets.on('connection', function (socket){
-
     socket.emit('connected');
 
 
@@ -25,17 +11,17 @@ var chat = io.sockets.on('connection', function (socket){
             clients = chat.clients(data.room),
             members = [];
 
-        var userModel = new UserModel();
-        userModel.name = data.name;
-        userModel.room = data.room;
-        userModel.key  = socket.id;
-        userModel.save(function(){
-            socket.emit('joined', userModel);
+        var user = new model.User();
+        user.attributes(data);
+        user.key = socket.id;
+        user.save(function(){
+            socket.emit('joined', user);
             
-            members = UserModel.find({room : data.room});
+            members = model.User.find({room : data.room});
             members = members.exec(function(err, docs){
+                docs[0].setUploader();
                 chat.in(data.room).emit('welcomed', {
-                    welcomedUser: userModel,
+                    user: user,
                     members: docs
                 });
             });
@@ -43,11 +29,15 @@ var chat = io.sockets.on('connection', function (socket){
     });
     
     socket.on('saying', function(data){
-        chat.in(data.room).emit('catched', {name: data.name, message: data.message});
+        var log = new model.ChatLog();
+        log.attributes(data);
+        log.key = socket.id;
+        log.save();
+        chat.in(data.room).emit('catched', {user: data.user, message: data.message});
     });
     
     socket.on('disconnect', function(){
-        UserModel.findOne({key : socket.id}).exec(function(err, doc){
+        model.User.findOne({key : socket.id}).exec(function(err, doc){
             chat.in(doc.room).emit('left', {user: doc});
             doc.remove();
         });
