@@ -42,6 +42,7 @@ var ChatLogSchema = new Schema({
     token : String,
     key   : String,
     text  : String,
+    message_type : String,
     date  : { type: Date, default: Date.now }
 });
 var ChatLog = mongo.model('ChatLog', ChatLogSchema);
@@ -51,6 +52,7 @@ var ChatLog = mongo.model('ChatLog', ChatLogSchema);
         this.token = data.user.token;
         this.room  = data.room;
         this.text  = data.message;
+        this.message_type = data.message_type;
     };
 })(ChatLog.prototype);
 

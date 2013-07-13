@@ -1,5 +1,6 @@
 var io = require('socket.io').listen(8080),
-    model = require('./model/user.js');
+    model = require('./model/user.js'),
+    lib   = require('./lib/shell.js');
 
 // socket
 var chat = io.sockets.on('connection', function (socket){
@@ -29,11 +30,22 @@ var chat = io.sockets.on('connection', function (socket){
     });
     
     socket.on('saying', function(data){
+        if(lib.shell.isCommand(data.message)){
+            data.message      = lib.shell.get(data);
+            data.message_type = 'cmd';
+        }else{
+            data.message_type = 'chat';
+        };
+
         var log = new model.ChatLog();
         log.attributes(data);
         log.key = socket.id;
         log.save();
-        chat.in(data.room).emit('catched', {user: data.user, message: data.message});
+        chat.in(data.room).emit('catched', {
+            user:         data.user, 
+            message:      data.message,
+            message_type: data.message_type
+        });
     });
     
     socket.on('disconnect', function(){
