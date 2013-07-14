@@ -66,4 +66,8 @@ var chat = io.sockets.on('connection', function (socket){
     socket.on('mouseUpping', function(data){
         chat.in(data.user.room).emit('mouseUpped', data);
     });
+
+    socket.on('lazyDrawing', function(data){
+        chat.in(data.user.room).emit('lazyDrew', data);
+    });
 });
