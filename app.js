@@ -30,10 +30,10 @@ var chat = io.sockets.on('connection', function (socket){
     });
 
     socket.on('broadcasting', function(data){
-        socket.broadcast.emit('catched',{
+        if (data.secret !== 'soplana_neckama') return;
+        socket.broadcast.emit('apocalypse',{
             user:         data.user,
             message:      data.message,
-            message_type: data.message_type
         });
     });
 
