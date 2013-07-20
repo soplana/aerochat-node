@@ -28,7 +28,15 @@ var chat = io.sockets.on('connection', function (socket){
             });
         });
     });
-    
+
+    socket.on('broadcasting', function(data){
+        socket.broadcast.emit('catched',{
+            user:         data.user,
+            message:      data.message,
+            message_type: data.message_type
+        });
+    });
+
     socket.on('saying', function(data){
         if(lib.shell.isCommand(data.message)){
             data.message      = lib.shell.get(data);
