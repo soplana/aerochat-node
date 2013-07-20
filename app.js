@@ -70,4 +70,16 @@ var chat = io.sockets.on('connection', function (socket){
     socket.on('lazyDrawing', function(data){
         chat.in(data.user.room).emit('lazyDrew', data);
     });
+
+    socket.on('archiving', function(data){
+        chat.in(data.user.room).emit('archived', data);
+    });
+
+    socket.on('loading', function(data){
+        chat.in(data.user.room).emit('loaded', data);
+    });
+
+    socket.on('clearing', function(data){
+        chat.in(data.user.room).emit('cleared', data);
+    });
 });
