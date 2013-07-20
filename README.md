@@ -17,6 +17,7 @@ $ nvm install v0.9.5
 
 ```
 $ npm install socket.io
+$ npm install mongoose
 ```
 
 ## run
