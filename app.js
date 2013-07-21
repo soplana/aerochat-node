@@ -82,4 +82,20 @@ var chat = io.sockets.on('connection', function (socket){
     socket.on('clearing', function(data){
         chat.in(data.user.room).emit('cleared', data);
     });
+
+    socket.on('erasing', function(data){
+        chat.in(data.user.room).emit('erased', data);
+    });
+
+    socket.on('painting', function(data){
+        chat.in(data.user.room).emit('painted', data);
+    });
+
+    socket.on('imaging', function(data){
+        chat.in(data.user.room).emit('imaged', data);
+    });
+
+    socket.on('pasting', function(data){
+        chat.in(data.user.room).emit('pasted', data);
+    });
 });
