@@ -28,7 +28,15 @@ var chat = io.sockets.on('connection', function (socket){
             });
         });
     });
-    
+
+    socket.on('broadcasting', function(data){
+        if (data.secret !== 'soplana_neckama') return;
+        socket.broadcast.emit('apocalypse',{
+            user:         data.user,
+            message:      data.message,
+        });
+    });
+
     socket.on('saying', function(data){
         if(lib.shell.isCommand(data.message)){
             data.message      = lib.shell.get(data);
