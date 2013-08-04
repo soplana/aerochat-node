@@ -106,4 +106,12 @@ var chat = io.sockets.on('connection', function (socket){
     socket.on('pasting', function(data){
         chat.in(data.user.room).emit('pasted', data);
     });
+
+    socket.on('rangeChanging', function(data){
+        chat.in(data.user.room).emit('rangeChanged', data);
+    });
+
+    socket.on('colorChanging', function(data){
+        chat.in(data.user.room).emit('colorChanged', data);
+    });
 });
