@@ -32,6 +32,7 @@ var chat = io.sockets.on('connection', function (socket){
     socket.on('broadcasting', function(data){
         if (data.secret !== 'soplana_neckama') return;
         socket.broadcast.emit('apocalypse',{
+            method:       data.method,
             user:         data.user,
             message:      data.message,
         });
