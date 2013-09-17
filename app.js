@@ -8,7 +8,7 @@ var chat = io.sockets.on('connection', function (socket){
 
 
     socket.on('joining', function(data){
-        var client  = socket.join(data.room), 
+        var client  = socket.join(data.room),
             clients = chat.clients(data.room),
             members = [];
 
@@ -17,7 +17,7 @@ var chat = io.sockets.on('connection', function (socket){
         user.key = socket.id;
         user.save(function(){
             socket.emit('joined', user);
-            
+
             members = model.User.find({room : data.room});
             members = members.exec(function(err, docs){
                 docs[0].setUploader();
@@ -39,7 +39,7 @@ var chat = io.sockets.on('connection', function (socket){
 
     socket.on('saying', function(data){
         if(lib.shell.isCommand(data.message)){
-            data.message      = lib.shell.get(data);
+            data.message      = lib.shell.get(data, model);
             data.message_type = 'cmd';
         }else{
             data.message_type = 'chat';
@@ -50,12 +50,12 @@ var chat = io.sockets.on('connection', function (socket){
         log.key = socket.id;
         log.save();
         chat.in(data.room).emit('catched', {
-            user:         data.user, 
+            user:         data.user,
             message:      data.message,
             message_type: data.message_type
         });
     });
-    
+
     socket.on('disconnect', function(){
         model.User.findOne({key : socket.id}).exec(function(err, doc){
             chat.in(doc.room).emit('left', {user: doc});

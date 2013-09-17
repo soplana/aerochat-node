@@ -14,9 +14,9 @@ var UserSchema = new Schema({
     _id   : ObjectId,
     name  : String,
     room  : String,
-    token : String,
-    key   : String,
-    uploader : {type: Boolean, default: false} 
+    token : String, // client side. room specific unique key
+    key   : String, // socket.io
+    uploader : {type: Boolean, default: false}
 });
 var User = mongo.model('User', UserSchema);
 (function(proto){
