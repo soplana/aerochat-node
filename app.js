@@ -83,6 +83,10 @@ var chat = io.sockets.on('connection', function (socket){
         chat.in(data.user.room).emit('archived', data);
     });
 
+    socket.on('forgetting', function(data){
+        chat.in(data.user.room).emit('forgot', data);
+    });
+
     socket.on('loading', function(data){
         chat.in(data.user.room).emit('loaded', data);
     });
@@ -108,6 +112,12 @@ var chat = io.sockets.on('connection', function (socket){
     });
 
     socket.on('rangeChanging', function(data){
+        model.User.findOne({key : socket.id}).exec(function(err, doc){
+            var tool = doc.tools[0] || {};
+            tool.size = data.px+'';
+            doc.tools[0] = tool;
+            doc.save();
+        });
         chat.in(data.user.room).emit('rangeChanged', data);
     });
 

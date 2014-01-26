@@ -6,6 +6,15 @@ var Schema = mongo.Schema, ObjectId = Schema.ObjectId;
 
 
 
+/****************************
+ * Tool model
+ ***************************/
+var ToolSchema = new Schema({
+    _id   : ObjectId,
+    color : {type: String, default: 'rgb(54,55,56)'},
+    size  : {type: String, default: '1'}
+});
+
 
 /****************************
  * User model
@@ -16,6 +25,7 @@ var UserSchema = new Schema({
     room  : String,
     token : String,
     key   : String,
+    tools : [ToolSchema],
     uploader : {type: Boolean, default: false} 
 });
 var User = mongo.model('User', UserSchema);
@@ -24,6 +34,8 @@ var User = mongo.model('User', UserSchema);
         this.name  = data.user.name;
         this.token = data.user.token;
         this.room  = data.room;
+        var tool   = !!data.tool ? data.tool : {};
+        this.tools.push(tool);
     };
 
     proto.setUploader = function(){
@@ -56,4 +68,7 @@ var ChatLog = mongo.model('ChatLog', ChatLogSchema);
     };
 })(ChatLog.prototype);
 
-module.exports = {ChatLog : ChatLog, User : User};
+module.exports = {
+    ChatLog : ChatLog, 
+    User    : User
+};
