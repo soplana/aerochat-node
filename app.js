@@ -2,6 +2,23 @@ var io = require('socket.io').listen(8080),
     model = require('./model/user.js'),
     lib   = require('./lib/shell.js');
 
+var helper = {
+    setLog : function(data, socket){
+        var log = new model.ChatLog();
+        log.attributes(data);
+        log.key = socket.id;
+        log.save();
+    },
+
+    emit : function(data, chat){
+        chat.in(data.room).emit('catched', {
+            user:         data.user, 
+            message:      data.message,
+            message_type: data.message_type
+        });
+    }
+}
+
 // socket
 var chat = io.sockets.on('connection', function (socket){
     socket.emit('connected');
@@ -39,21 +56,21 @@ var chat = io.sockets.on('connection', function (socket){
 
     socket.on('saying', function(data){
         if(lib.shell.isCommand(data.message)){
-            data.message      = lib.shell.get(data);
-            data.message_type = 'cmd';
+            lib.shell.get(data, model, function(message, isRecord){
+                data.message      = message;
+                data.message_type = 'cmd';
+
+                if(isRecord)
+                    helper.setLog(data, socket);
+                helper.emit(data, chat);
+            });
         }else{
             data.message_type = 'chat';
+
+            helper.setLog(data, socket);
+            helper.emit(data, chat);
         };
 
-        var log = new model.ChatLog();
-        log.attributes(data);
-        log.key = socket.id;
-        log.save();
-        chat.in(data.room).emit('catched', {
-            user:         data.user, 
-            message:      data.message,
-            message_type: data.message_type
-        });
     });
     
     socket.on('disconnect', function(){
